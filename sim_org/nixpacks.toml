@@ -1,12 +1,13 @@
 [phases.setup]
 nixPkgs = [
-  "python311",    # Ensure the correct Python version
-  "xorg.xorgserver",  # Correct package for Xvfb
-  "SDL2",         # Main SDL2 library
-  "SDL2_image",   # SDL2 image support
-  "SDL2_mixer",   # SDL2 audio mixer
-  "SDL2_ttf",     # SDL2 TrueType font support
-  "fontconfig"    # Required for font rendering
+  "python311",
+  "xorg.xorgserver",      # Provides Xvfb
+  "xorg.xf86videodummy",  # Needed for headless rendering
+  "SDL2",
+  "SDL2_image",
+  "SDL2_mixer",
+  "SDL2_ttf",
+  "fontconfig"
 ]
 
 
