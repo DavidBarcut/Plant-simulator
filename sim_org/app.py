@@ -307,8 +307,9 @@ def run_flask():
 # Start background tasks using Socket.IO's built-in support.
 socketio.start_background_task(frame_emitter)
 socketio.start_background_task(sim.game_loop)
-
+sim.game_loop()
+run_flask()
 
 if __name__ == '__main__':
     run_flask()
-    sim.game_loop()
+    
