@@ -30,9 +30,12 @@ def capture_frame():
 
 def frame_emitter():
     while True:
+        print("Capturing frame now...")
         frame_data = capture_frame()
+        print("Got frame_data length:", len(frame_data))  # Debug
         socketio.emit('frame', {'data': frame_data})
-        socketio.sleep(0.2)  # ~5 FPS
+        socketio.sleep(0.2)
+
 
 
 @socketio.on('connect')

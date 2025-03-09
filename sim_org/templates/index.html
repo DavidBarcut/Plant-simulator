@@ -304,10 +304,12 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
       var socket = io();
+      
     socket.on('connect', function() {
       console.log('Connected to SocketIO');
     });
     socket.on('frame', function(msg) {
+      console.log("Got frame event!", msg);
       // Update the <img> with base64 data
       document.getElementById("gameScreen").src = "data:image/jpeg;base64," + msg.data;
     });
