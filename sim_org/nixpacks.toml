@@ -10,5 +10,6 @@ aptPkgs = [
 
 
 [start]
-cmd = "gunicorn app:app"
+cmd = "xvfb-run -a -s '-screen 0 1024x768x24' gunicorn -w 1 -k eventlet -b 0.0.0.0:$PORT app:app"
+
 
