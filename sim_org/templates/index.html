@@ -309,7 +309,7 @@
       console.log('Connected to SocketIO');
     });
     socket.on('frame', function(msg) {
-      console.log("Got frame event!", msg);
+      // console.log("Got frame event!", msg);
       // Update the <img> with base64 data
       document.getElementById("gameScreen").src = "data:image/jpeg;base64," + msg.data;
     });
