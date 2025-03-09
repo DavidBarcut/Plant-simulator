@@ -10,8 +10,8 @@ from Plants.plant import Seed
 from water import WaterBlock
 from weather import sun, moon, draw_sky, simulate_rain, update_and_draw_rain, set_season, current_season
 from config import SCREEN_SIZE, WHITE, CELL_SIZE, ROWS, COLS
-import os
-os.environ["SDL_VIDEODRIVER"] = "dummy"
+# import os
+# os.environ["SDL_VIDEODRIVER"] = "dummy"
 
 screen = pygame.display.set_mode(SCREEN_SIZE)
 
