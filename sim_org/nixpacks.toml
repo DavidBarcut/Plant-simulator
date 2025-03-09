@@ -11,6 +11,6 @@ nixPkgs = [
 ]
 
 [start]
-cmd = "Xvfb :99 -screen 0 1024x768x24 & export DISPLAY=:99 && gunicorn -w 1 -k eventlet -b 0.0.0.0:$PORT app:app"
+cmd = "Xvfb :99 -screen 0 1024x768x24 & export DISPLAY=:99 && gunicorn -w 1 -k eventlet --timeout 120 -b 0.0.0.0:$PORT app:app"
 
 

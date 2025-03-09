@@ -24,15 +24,20 @@ def index():
 def capture_frame():
     with sim.screen_lock:
         surface_copy = screen.copy()
-        pygame.image.save(surface_copy, "debug_frame.jpg")  # Save a frame for debugging
-        frame_str = pygame.image.tostring(surface_copy, 'RGB')
-        image = Image.frombytes('RGB', sim.SCREEN_SIZE, frame_str)
-        byte_io = io.BytesIO()
-        image.save(byte_io, 'JPEG')
-        byte_io.seek(0)
-    
-    print("Frame captured!")  # Debugging log
-    return byte_io
+        pygame.image.save(surface_copy, "debug_frame.jpg")  # Save frame
+        
+        try:
+            frame_str = pygame.image.tostring(surface_copy, 'RGB')
+            image = Image.frombytes('RGB', sim.SCREEN_SIZE, frame_str)
+            byte_io = io.BytesIO()
+            image.save(byte_io, 'JPEG')
+            byte_io.seek(0)
+            print("Frame successfully converted to string")  # Debugging
+            return byte_io
+        except Exception as e:
+            print("Error converting frame:", e)
+            return None
+
 
 
 @app.route('/video_feed')
