@@ -177,7 +177,7 @@ def pause_simulation():
 def game_loop():
     global display_info_mode, soil_info_text, soil_info_pos
     running = True
-    pygame.display.set_mode(SCREEN_SIZE)
+    
     while running:
         print("Game loop running")
         for event in pygame.event.get():
