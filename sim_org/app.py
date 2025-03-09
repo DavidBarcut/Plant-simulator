@@ -32,9 +32,10 @@ def frame_emitter():
     while True:
         print("Capturing frame now...")
         frame_data = capture_frame()
-        print("Got frame_data length:", len(frame_data))  # Debug
+        print("Frame length:", len(frame_data))  # Debug
         socketio.emit('frame', {'data': frame_data})
-        socketio.sleep(0.2)
+        socketio.sleep(0.2)  # ~5 FPS
+
 
 
 
@@ -289,13 +290,11 @@ def run_flask():
     socketio.run(app, host="0.0.0.0", port=port, debug=False, use_reloader=False)
 
 if __name__ == '__main__':
-    # Start Socket.IO
     flask_thread = threading.Thread(target=run_flask, daemon=True)
     flask_thread.start()
 
-    # Start frame emitter
     emitter_thread = threading.Thread(target=frame_emitter, daemon=True)
     emitter_thread.start()
 
-    # Start your game loop
     sim.game_loop()
+
