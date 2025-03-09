@@ -10,5 +10,5 @@ aptPkgs = [
 
 
 [start]
-cmd = "xvfb-run gunicorn app:app"
+cmd = "gunicorn app:app"
 
