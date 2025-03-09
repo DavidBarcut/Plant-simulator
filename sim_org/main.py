@@ -175,9 +175,11 @@ def pause_simulation():
 
 
 def game_loop():
+
     global display_info_mode, soil_info_text, soil_info_pos
     running = True
     while running:
+        print("Game loop running...")  # Debug log
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -204,7 +206,11 @@ def game_loop():
 
 
         with screen_lock:
-            screen.fill(WHITE)
+           
+            screen.fill((255, 255, 255))
+            pygame.draw.rect(screen, (255, 0, 0), (50, 50, 200, 200))  # Red box for debug
+            pygame.display.flip()
+            # screen.fill(WHITE)
             if simulation_running:
                 sun.update()
                 moon.update()
