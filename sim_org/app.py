@@ -297,3 +297,6 @@ def start_all_threads():
     emitter_thread.start()
 
     sim.game_loop()
+
+
+start_all_threads()
