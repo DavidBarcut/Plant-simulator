@@ -20,7 +20,6 @@ socketio = SocketIO(app, async_mode='eventlet')
 def index():
     return render_template('index.html')
 def capture_frame():
-    # Convert Pygame screen to base64
     frame_str = pygame.image.tostring(screen, 'RGB')
     image = Image.frombytes('RGB', sim.SCREEN_SIZE, frame_str)
     byte_io = io.BytesIO()
@@ -30,11 +29,14 @@ def capture_frame():
 
 def frame_emitter():
     while True:
-        print("Capturing frame now...")
-        frame_data = capture_frame()
-        print("Frame length:", len(frame_data))  # Debug
-        socketio.emit('frame', {'data': frame_data})
-        socketio.sleep(0.2)  # ~5 FPS
+        try:
+            print("Capturing frame now...")
+            frame_data = capture_frame()
+            print("Frame length:", len(frame_data))
+            socketio.emit('frame', {'data': frame_data})
+        except Exception as e:
+            print("Error in frame_emitter:", e)
+        socketio.sleep(0.2)
 
 
 
@@ -286,17 +288,13 @@ def get_environment_info():
 
 def run_flask():
     port = int(os.environ.get("PORT", 5000))
-    # Use socketio.run so that Socket.IO is integrated
     socketio.run(app, host="0.0.0.0", port=port, debug=False, use_reloader=False)
 
-def start_all_threads():
-    flask_thread = threading.Thread(target=run_flask, daemon=True)
-    flask_thread.start()
+# Start background tasks using Socket.IO's built-in support.
+socketio.start_background_task(frame_emitter)
+socketio.start_background_task(sim.game_loop)
 
-    emitter_thread = threading.Thread(target=frame_emitter, daemon=True)
-    emitter_thread.start()
 
+if __name__ == '__main__':
+    run_flask()
     sim.game_loop()
-
-
-start_all_threads()
