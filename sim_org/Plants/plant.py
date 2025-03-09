@@ -102,6 +102,7 @@ class Seed:
 
     def draw(self, screen, simulation_running):
         self.apply_gravity()
+        print(f"Drawing seed at ({self.x}, {self.y})")
         pygame.draw.circle(screen, SEED_COLOUR, (int(self.x), int(self.y)), self.size)
 
         if simulation_running and self.on_ground:
