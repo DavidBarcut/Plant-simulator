@@ -1,0 +1,11 @@
+[phases.setup]
+aptPkgs = [
+  "libsdl2-dev",
+  "libsdl2-image-dev",
+  "libsdl2-mixer-dev",
+  "libsdl2-ttf-dev",
+  "xvfb"
+]
+
+[start]
+cmd = 'xvfb-run -a -s "-screen 0 1280x720x24" python app.py'
