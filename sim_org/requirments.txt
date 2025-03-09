@@ -1,5 +1,6 @@
-flask
-flask_socketio
+Flask
+Flask-SocketIO
 pygame
-Pillow
 gunicorn
+Pillow
+eventlet
