@@ -7,7 +7,8 @@ import pygame
 import io
 from PIL import Image
 import config
-
+import os
+os.environ["SDL_VIDEODRIVER"] = "dummy"  
 
 import main as sim
 from main import screen  
