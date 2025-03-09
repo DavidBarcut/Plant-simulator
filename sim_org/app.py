@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, jsonify
 from flask_socketio import SocketIO, emit
 import threading
 import pygame
-import io
+import io, base64
 from PIL import Image
 import config
 import os
@@ -19,31 +19,21 @@ socketio = SocketIO(app, async_mode='eventlet')
 @app.route('/')
 def index():
     return render_template('index.html')
-
 def capture_frame():
-    with sim.screen_lock:
-        # (Optional) Save a debug frame locally
-        pygame.image.save(screen, "debug_frame.jpg")
-        try:
-            frame_str = pygame.image.tostring(screen, 'RGB')
-            image = Image.frombytes('RGB', sim.SCREEN_SIZE, frame_str)
-            byte_io = io.BytesIO()
-            image.save(byte_io, 'JPEG')
-            data = byte_io.getvalue()
-            import base64
-            base64_data = base64.b64encode(data).decode('utf-8')
-            print("Frame successfully converted to string")  # Debug log
-            return base64_data
-        except Exception as e:
-            print("Error converting frame:", e)
-            return ""
+    # Convert Pygame screen to base64
+    frame_str = pygame.image.tostring(screen, 'RGB')
+    image = Image.frombytes('RGB', sim.SCREEN_SIZE, frame_str)
+    byte_io = io.BytesIO()
+    image.save(byte_io, 'JPEG')
+    data = byte_io.getvalue()
+    return base64.b64encode(data).decode('utf-8')
 
 def frame_emitter():
-    # Continuously capture a frame and emit it to all connected clients
     while True:
         frame_data = capture_frame()
         socketio.emit('frame', {'data': frame_data})
-        socketio.sleep(0.2)  # Adjust the sleep time for your desired frame rate
+        socketio.sleep(0.2)  # ~5 FPS
+
 
 @socketio.on('connect')
 def on_connect():
@@ -296,11 +286,13 @@ def run_flask():
     socketio.run(app, host="0.0.0.0", port=port, debug=False, use_reloader=False)
 
 if __name__ == '__main__':
-    # Start the Flask/SocketIO server in its own thread
+    # Start Socket.IO
     flask_thread = threading.Thread(target=run_flask, daemon=True)
     flask_thread.start()
-    # Start the frame emitter thread to broadcast frames over websockets
+
+    # Start frame emitter
     emitter_thread = threading.Thread(target=frame_emitter, daemon=True)
     emitter_thread.start()
-    # Run the simulation game loop (this is blocking)
+
+    # Start your game loop
     sim.game_loop()
