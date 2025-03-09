@@ -30,9 +30,9 @@ def capture_frame():
 def frame_emitter():
     while True:
         try:
-            print("Capturing frame now...")
+            # print("Capturing frame now...")
             frame_data = capture_frame()
-            print("Frame length:", len(frame_data))
+            # print("Frame length:", len(frame_data))
             socketio.emit('frame', {'data': frame_data})
         except Exception as e:
             print("Error in frame_emitter:", e)
