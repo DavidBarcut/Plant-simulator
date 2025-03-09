@@ -10,8 +10,7 @@ nixPkgs = [
   "fontconfig"
 ]
 
-
 [start]
-cmd = "xvfb-run -a -s '-screen 0 1024x768x24' gunicorn -w 1 -k eventlet -b 0.0.0.0:$PORT app:app"
+cmd = "Xvfb :99 -screen 0 1024x768x24 & export DISPLAY=:99 && gunicorn -w 1 -k eventlet -b 0.0.0.0:$PORT app:app"
 
 
