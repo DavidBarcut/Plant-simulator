@@ -8,4 +8,5 @@ aptPkgs = [
 ]
 
 [start]
-cmd = 'xvfb-run -a -s "-screen 0 1280x720x24" python app.py'
+cmd = gunicorn app:app
+
