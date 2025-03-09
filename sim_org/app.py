@@ -1,6 +1,4 @@
-# app.py
-
-from flask import Flask, render_template, Response, request, jsonify
+from flask import Flask, render_template, request, jsonify
 from flask_socketio import SocketIO, emit
 import threading
 import pygame
@@ -8,15 +6,15 @@ import io
 from PIL import Image
 import config
 import os
-os.environ["SDL_VIDEODRIVER"] = "dummy"  
+os.environ["SDL_VIDEODRIVER"] = "dummy"  # Force headless mode
 
 import main as sim
-from main import screen  
+from main import screen  # Our Pygame screen
 
 from soil import SOIL_TYPES, SEASONS
 
 app = Flask(__name__)
-
+socketio = SocketIO(app, async_mode='eventlet')
 
 @app.route('/')
 def index():
@@ -24,31 +22,66 @@ def index():
 
 def capture_frame():
     with sim.screen_lock:
-        surface_copy = screen.copy()
-        pygame.image.save(surface_copy, "debug_frame.jpg")  # Save frame
-        
+        # (Optional) Save a debug frame locally
+        pygame.image.save(screen, "debug_frame.jpg")
         try:
-            frame_str = pygame.image.tostring(surface_copy, 'RGB')
+            frame_str = pygame.image.tostring(screen, 'RGB')
             image = Image.frombytes('RGB', sim.SCREEN_SIZE, frame_str)
             byte_io = io.BytesIO()
             image.save(byte_io, 'JPEG')
-            byte_io.seek(0)
-            print("Frame successfully converted to string")  # Debugging
-            return byte_io
+            data = byte_io.getvalue()
+            import base64
+            base64_data = base64.b64encode(data).decode('utf-8')
+            print("Frame successfully converted to string")  # Debug log
+            return base64_data
         except Exception as e:
             print("Error converting frame:", e)
-            return None
+            return ""
+
+def frame_emitter():
+    # Continuously capture a frame and emit it to all connected clients
+    while True:
+        frame_data = capture_frame()
+        socketio.emit('frame', {'data': frame_data})
+        socketio.sleep(0.2)  # Adjust the sleep time for your desired frame rate
+
+@socketio.on('connect')
+def on_connect():
+    print("Client connected via SocketIO")
 
 
 
-@app.route('/video_feed')
-def video_feed():
-    def generate():
-        while True:
-            frame = capture_frame()
-            yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + frame.read() + b'\r\n')
-    return Response(generate(), mimetype='multipart/x-mixed-replace; boundary=frame')
+# @app.route('/')
+# def index():
+#     return render_template('index.html')
+
+# def capture_frame():
+#     with sim.screen_lock:
+#         surface_copy = screen.copy()
+#         pygame.image.save(surface_copy, "debug_frame.jpg")  # Save frame
+        
+#         try:
+#             frame_str = pygame.image.tostring(surface_copy, 'RGB')
+#             image = Image.frombytes('RGB', sim.SCREEN_SIZE, frame_str)
+#             byte_io = io.BytesIO()
+#             image.save(byte_io, 'JPEG')
+#             byte_io.seek(0)
+#             print("Frame successfully converted to string")  # Debugging
+#             return byte_io
+#         except Exception as e:
+#             print("Error converting frame:", e)
+#             return None
+
+
+
+# @app.route('/video_feed')
+# def video_feed():
+#     def generate():
+#         while True:
+#             frame = capture_frame()
+#             yield (b'--frame\r\n'
+#                    b'Content-Type: image/jpeg\r\n\r\n' + frame.read() + b'\r\n')
+#     return Response(generate(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 @app.route('/set_overlay', methods=['POST'])
 def set_overlay():
@@ -258,11 +291,16 @@ def get_environment_info():
 
 
 def run_flask():
-    app.run(debug=True, use_reloader=False)
-
-    
+    port = int(os.environ.get("PORT", 5000))
+    # Use socketio.run so that Socket.IO is integrated
+    socketio.run(app, host="0.0.0.0", port=port, debug=False, use_reloader=False)
 
 if __name__ == '__main__':
+    # Start the Flask/SocketIO server in its own thread
     flask_thread = threading.Thread(target=run_flask, daemon=True)
     flask_thread.start()
+    # Start the frame emitter thread to broadcast frames over websockets
+    emitter_thread = threading.Thread(target=frame_emitter, daemon=True)
+    emitter_thread.start()
+    # Run the simulation game loop (this is blocking)
     sim.game_loop()
