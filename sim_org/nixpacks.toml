@@ -2,12 +2,13 @@
 nixPkgs = [
   "python311",
   "xvfb",
-  "libsdl2",
-  "libsdl2-image",
-  "libsdl2-mixer",
-  "libsdl2-ttf",
+  "SDL2",
+  "SDL2_image",
+  "SDL2_mixer",
+  "SDL2_ttf",
   "fontconfig"
 ]
+
 
 
 [start]
