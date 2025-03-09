@@ -9,5 +9,6 @@ aptPkgs = [
 
 
 [start]
-cmd = "python3 -m gunicorn app:app"
+cmd = ".venv/bin/gunicorn app:app"
+
 
