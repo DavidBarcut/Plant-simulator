@@ -1,6 +1,6 @@
 Flask
 Flask-SocketIO
 pygame
-gunicorn
+Gunicorn
 Pillow
 eventlet
