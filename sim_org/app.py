@@ -176,25 +176,39 @@ def pause_simulation():
 def get_plant_stats():
     stats_list = []
     for seed in sim.seeds:
-        if seed.plant.alive:
-            if seed.hydration >= seed.saturation_ratio:
-                stats_list.append(seed.plant.get_stats())
-
+        if seed.plant is not None:
+            if seed.plant.alive:
+                if seed.hydration >= seed.saturation_ratio:
+                    stats_list.append(seed.plant.get_stats())
+                else:
+                    stats_list.append(seed.get_stats())
             else:
-                stats_list.append(seed.get_stats())
+                stats_list.append({
+                    "plant_type": seed.plant.plant_type,
+                    "stage": seed.plant.stage,
+                    "resource_status": "Dead",
+                    "time_to_germinate": seed.time_to_germinate,
+                    "health": "dead",
+                    "weight": 0,
+                    "height": 0,
+                    "root_depth": 0,
+                    "age": seed.age
+                })
         else:
+            # Handle seeds that haven't germinated or don't have a plant
             stats_list.append({
-                "plant_type": seed.plant.plant_type,
-                "stage": seed.plant.stage,
-                "resource_status": "Dead",
+                "plant_type": "seed",
+                "stage": "Not germinated",
+                "resource_status": "Not germinated",
                 "time_to_germinate": seed.time_to_germinate,
-                "health": "dead",
+                "health": "N/A",
                 "weight": 0,
                 "height": 0,
                 "root_depth": 0,
                 "age": seed.age
             })
     return jsonify(stats_list)
+
 
 
 
