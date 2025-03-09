@@ -9,6 +9,5 @@ aptPkgs = [
 
 
 [start]
-cmd = ".venv/bin/gunicorn app:app"
-
+cmd = "gunicorn app:app"
 
