@@ -22,16 +22,18 @@ def index():
     return render_template('index.html')
 
 def capture_frame():
-   
     with sim.screen_lock:
-       
         surface_copy = screen.copy()
+        pygame.image.save(surface_copy, "debug_frame.jpg")  # Save a frame for debugging
         frame_str = pygame.image.tostring(surface_copy, 'RGB')
         image = Image.frombytes('RGB', sim.SCREEN_SIZE, frame_str)
         byte_io = io.BytesIO()
         image.save(byte_io, 'JPEG')
         byte_io.seek(0)
+    
+    print("Frame captured!")  # Debugging log
     return byte_io
+
 
 @app.route('/video_feed')
 def video_feed():
