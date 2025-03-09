@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Plant Growth Simulation</title>
+  <!-- Bootstrap CSS -->
+  <link
+    href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <style>
+    body {
+      background-color: #000;
+      color: #fff;
+    }
+    .card {
+      background-color: #333;
+    }
+    .card-header {
+      background-color: #444;
+      border-bottom: 1px solid #555;
+    }
+    .btn-outline-info,
+    .btn-outline-primary {
+      color: #fff;
+      border-color: #fff;
+    }
+    .btn-outline-info:hover,
+    .btn-outline-primary:hover {
+      background-color: #fff;
+      color: #000;
+    }
+  </style>
+</head>
+<body>
+  <div class="container-fluid mt-4">
+    <!-- Row 1: Info Boxes, Game Screen, Plant Actions & Simulation Controls -->
+    <div class="row">
+      <!-- Left Sidebar: Information Boxes -->
+      <div class="col-md-3">
+        <!-- Plant Information -->
+        <div id="plantStatsContainer" class="card mb-4">
+            <!-- Card Header with Arrow Buttons on the Right -->
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <h5 class="mb-0">Plant Information</h5>
+              <div>
+                <button id="prevPlantButton" class="btn btn-outline-info btn-sm">&lt;</button>
+                <button id="nextPlantButton" class="btn btn-outline-info btn-sm">&gt;</button>
+              </div>
+            </div>
+          
+            <!-- Card Body Left-Aligned -->
+            <div class="card-body">
+              <div id="plantStatDisplay" class="text-left">
+                Loading...
+              </div>
+            </div>
+          </div>
+          
+          
+        <!-- Environment Information -->
+        <div class="card">
+          <div class="card-header">
+            <h5 class="mb-0">Environment Information</h5>
+          </div>
+          <div class="card-body">
+            <p id="envTemperature">Temperature: -- °C</p>
+            <p id="envDaylight">Daylight: -- hours</p>
+            <p id="envPrecipitation">Precipitation: --</p>
+            <p id="envMoisture">Average Moisture: --</p>
+            <p id="envPH">Soil pH: --</p>
+            <h6>Soil Info</h6>
+            <div class="btn-group d-flex flex-wrap">
+                <button type="button" class="btn btn-outline-info m-1" id="displayInfoButton">
+                Toggle Soil Info
+                </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Center Column: Game Screen -->
+      <div class="col-md-6">
+        <div class="card mb-4">
+          <div class="card-body text-center">
+            <img
+                id="gameScreen"
+                src="{{ url_for('video_feed') }}"
+                class="img-fluid"
+                alt="Simulation Screen"
+                width="1200"
+                height="900"
+                />
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Sidebar: Plant Actions & Simulation Controls -->
+      <div class="col-md-3">
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5 class="mb-0">Plant Actions & Controls</h5>
+          </div>
+          <div class="card-body">
+            <div class="mb-3">
+              <h6>Place Plant</h6>
+              <button id="plantType1Button" class="btn btn-outline-info btn-block mb-2">
+                Plant Type 1
+              </button>
+              <!-- <button id="plantType2Button" class="btn btn-outline-info btn-block mb-2">
+                Prickly Pear Cactus
+              </button>
+              <button class="btn btn-outline-info btn-block mb-2">
+                Plant Type 3
+              </button>
+              <button class="btn btn-outline-info btn-block mb-2">
+                Plant Type 4
+              </button> -->
+            </div>
+            <div>
+              <h6>Simulation Controls</h6>
+              <button id="startButton" class="btn btn-success btn-block mb-2">
+                Start Simulation
+              </button>
+              <button id="pauseButton" class="btn btn-warning btn-block mb-2">
+                Pause Simulation
+              </button>
+              <button id="resetButton" class="btn btn-danger btn-block mb-2">
+                Reset Simulation
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 2: Centered Environment Controls -->
+    <div class="row">
+      <div class="col-md-8 offset-md-2">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="mb-0">Environment Controls</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <!-- Left Column: Numeric and Range Controls -->
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <button id="placeWaterButton" class="btn btn-outline-info btn-block mb-2">
+                    Place Water
+                  </button>
+                  <input
+                    type="number"
+                    id="waterPoolSize"
+                    class="form-control mb-2"
+                    placeholder="Water Pool Size"
+                    min="1"
+                    max="10"
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="tempInput">Temperature (°C):</label>
+                  <div class="input-group">
+                    <input
+                      type="number"
+                      id="tempInput"
+                      class="form-control"
+                      value="15"
+                      step="0.5"
+                    />
+                    <div class="input-group-append">
+                      <button id="setTempButton" class="btn btn-outline-info">
+                        Set Temperature
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="phInput">Soil pH:</label>
+                  <div class="input-group">
+                    <input
+                      type="number"
+                      id="phInput"
+                      class="form-control"
+                      value="7"
+                      step="0.1"
+                    />
+                    <div class="input-group-append">
+                      <button id="setPhButton" class="btn btn-outline-info">
+                        Set Soil pH
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <!-- <div class="form-group">
+                  <label for="timeSlider">Time of Day:</label>
+                  <input type="range" id="timeSlider" class="custom-range" min="0" max="100" value="0">
+                </div> -->
+              </div>
+
+              <!-- Right Column: Selection Controls -->
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <h6>Select Season</h6>
+                  <div class="btn-group d-flex flex-wrap">
+                    <button type="button" class="btn btn-outline-info m-1" id="springButton">
+                      Spring
+                    </button>
+                    <button type="button" class="btn btn-outline-info m-1" id="summerButton">
+                      Summer
+                    </button>
+                    <button type="button" class="btn btn-outline-info m-1" id="autumnButton">
+                      Autumn
+                    </button>
+                    <button type="button" class="btn btn-outline-info m-1" id="winterButton">
+                      Winter
+                    </button>
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <h6>Select Soil Type</h6>
+                  <div class="btn-group d-flex flex-wrap">
+                    <button type="button" class="btn btn-outline-info m-1" id="sandyButton">
+                      Sandy
+                    </button>
+                    <button type="button" class="btn btn-outline-info m-1" id="clayButton">
+                      Clay
+                    </button>
+                    <button type="button" class="btn btn-outline-info m-1" id="siltButton">
+                      Silt
+                    </button>
+                    <button type="button" class="btn btn-outline-info m-1" id="peatButton">
+                      Peat
+                    </button>
+                    <button type="button" class="btn btn-outline-info m-1" id="chalkButton">
+                      Chalk
+                    </button>
+                    <button type="button" class="btn btn-outline-info m-1" id="loamButton">
+                      Loam
+                    </button>
+                    <button type="button" class="btn btn-outline-info m-1" id="brownEarthButton">
+                      Brown Earth
+                    </button>
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <h6>Overlay Grid</h6>
+                  <div class="btn-group d-flex flex-wrap">
+                    <button type="button" class="btn btn-outline-info m-1" id="moistureOverlayButton">
+                      Moisture Grid
+                    </button>
+                    <button type="button" class="btn btn-outline-info m-1" id="nutrientOverlayButton">
+                      Nutrient Grid
+                    </button>
+                    <button type="button" class="btn btn-outline-info m-1" id="combinedOverlayButton">
+                      Combined Grid
+                    </button>
+                    <button type="button" class="btn btn-outline-info m-1" id="toggleOverlayGridButton">
+                      Hide Overlay Grid
+                    </button>
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <h6>Place Rain Clouds</h6>
+                  <div class="btn-group d-flex flex-wrap">
+                    <button type="button" class="btn btn-outline-info m-1" id="noRainButton">
+                      No Rain
+                    </button>
+                    <button type="button" class="btn btn-outline-info m-1" id="lightRainButton">
+                      Light Rain
+                    </button>
+                    <button type="button" class="btn btn-outline-info m-1" id="moderateRainButton">
+                      Moderate Rain
+                    </button>
+                    <button type="button" class="btn btn-outline-info m-1" id="heavyRainButton">
+                      Heavy Rain
+                    </button>
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <h6>Time Scale Presets</h6>
+                  <div class="btn-group d-flex flex-wrap">
+                    <button type="button" class="btn btn-outline-primary m-1" id="normalSpeedButton">
+                      Normal
+                    </button>
+                    <button type="button" class="btn btn-outline-primary m-1" id="fastSpeedButton">
+                      Fast
+                    </button>
+                    <button type="button" class="btn btn-outline-primary m-1" id="ultraFastSpeedButton">
+                      Ultra Fast
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div> <!-- end row -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS and dependencies -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script>
+    // Season selection
+    function setSeason(season) {
+      fetch('/set_season', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ season: season })
+      }).then(response => {
+        if (response.ok) {
+          console.log(`Season set to ${season}`);
+        }
+      });
+    }
+    document.getElementById('springButton').addEventListener('click', () => setSeason('spring'));
+    document.getElementById('summerButton').addEventListener('click', () => setSeason('summer'));
+    document.getElementById('autumnButton').addEventListener('click', () => setSeason('autumn'));
+    document.getElementById('winterButton').addEventListener('click', () => setSeason('winter'));
+
+    // Soil type selection
+    function setSoilType(soilType) {
+      fetch('/set_soil_type', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ soil_type: soilType })
+      }).then(response => {
+        if (response.ok) {
+          console.log(`Soil type set to ${soilType}`);
+        }
+      });
+    }
+    document.getElementById('sandyButton').addEventListener('click', () => setSoilType('sandy'));
+    document.getElementById('clayButton').addEventListener('click', () => setSoilType('clay'));
+    document.getElementById('siltButton').addEventListener('click', () => setSoilType('silt'));
+    document.getElementById('peatButton').addEventListener('click', () => setSoilType('peat'));
+    document.getElementById('chalkButton').addEventListener('click', () => setSoilType('chalk'));
+    document.getElementById('loamButton').addEventListener('click', () => setSoilType('loam'));
+    document.getElementById('brownEarthButton').addEventListener('click', () => setSoilType('brown_earth'));
+
+    // Plant seed and water placement modes
+    let placeWaterMode = false;
+    let placeSeedMode = false;
+    document.getElementById('placeWaterButton').addEventListener('click', () => {
+      placeWaterMode = true;
+      placeSeedMode = false;
+      console.log("Place Water mode activated");
+    });
+    document.getElementById('plantType1Button').addEventListener('click', () => {
+      placeSeedMode = true;
+      placeWaterMode = false;
+    });
+    // document.getElementById('plantType2Button').addEventListener('click', () => {
+    //   placeSeedMode = true;
+    //   window.seedType = 'cactus';
+    //   console.log('Cactus seed selected');
+    // });
+    document.getElementById('gameScreen').addEventListener('click', function (event) {
+      const rect = event.target.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+      console.log(`Mouse click at: (${x}, ${y})`);
+
+      if (placeWaterMode) {
+        const size = document.getElementById('waterPoolSize').value || 4;
+        fetch('/mouse_event', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ x: x, y: y, type: 'water', size: size })
+        });
+        placeWaterMode = false;
+      } else if (placeSeedMode) {
+        fetch('/mouse_event', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            x: x,
+            y: y,
+            type: 'seed',
+            seed_type: window.seedType || 'normal'
+          })
+        });
+        placeSeedMode = false;
+        window.seedType = null;
+      }
+    });
+
+    // Simulation controls
+    document.getElementById('startButton').addEventListener('click', () => {
+      fetch('/start_simulation', { method: 'POST' }).then(response => {
+        if (response.ok) console.log('Simulation started');
+      });
+    });
+    document.getElementById('pauseButton').addEventListener('click', () => {
+      fetch('/pause_simulation', { method: 'POST' }).then(response => {
+        if (response.ok) console.log('Simulation paused');
+      });
+    });
+    document.getElementById('resetButton').addEventListener('click', () => {
+      fetch('/reset_simulation', { method: 'POST' }).then(response => {
+        if (response.ok) console.log('Simulation reset');
+      });
+    });
+
+    // // Time slider
+    // document.getElementById('timeSlider').addEventListener('input', function () {
+    //   const timeValue = parseInt(this.value, 10);
+    //   fetch('/set_time_of_day', {
+    //     method: 'POST',
+    //     headers: { 'Content-Type': 'application/json' },
+    //     body: JSON.stringify({ time: timeValue })
+    //   }).then(response => {
+    //     if (response.ok) console.log('Time of day set to', timeValue);
+    //   });
+    // });
+
+    let plantsStats = [];
+let currentPlantIndex = 0;
+
+function updatePlantStats() {
+  fetch('/get_plant_stats')
+    .then(response => response.json())
+    .then(data => {
+      // Save the array of plant stats.
+      plantsStats = data;
+      // Ensure the current index is within range.
+      if (currentPlantIndex >= plantsStats.length) {
+        currentPlantIndex = 0;
+      }
+      displayCurrentPlantStats();
+    })
+    .catch(error => console.error('Error fetching plant stats:', error));
+}
+
+function displayCurrentPlantStats() {
+  const displayElem = document.getElementById('plantStatDisplay');
+  if (plantsStats.length === 0) {
+    displayElem.innerHTML = 'No plants available';
+    return;
+  }
+  
+  const stats = plantsStats[currentPlantIndex];
+  let statsHtml = `
+    <div class="plant-stat">
+      <h6>Plant ${currentPlantIndex + 1} of ${plantsStats.length}</h6>
+      <p>Type: ${stats.plant_type}</p>
+      <p>Stage: ${stats.stage}</p>
+      <p>Status: ${stats.resource_status}</p>
+      <p>Height: ${stats.height.toFixed(2)} cm</p>
+      <p>Root Depth: ${stats.root_depth.toFixed(2)} cm</p>
+      <p>Age: ${stats.age.toFixed(2)} days</p>
+      <p>Weight: ${stats.weight} Kg</p>
+      <p>Health: ${stats.health}</p>
+      <p>Time to Germinate: ${stats.time_to_germinate.toFixed(2)} days</p>
+    </div>
+  `;
+  displayElem.innerHTML = statsHtml;
+}
+
+
+// Event listeners for the arrow buttons:
+document.getElementById('prevPlantButton').addEventListener('click', () => {
+  if (plantsStats.length > 0) {
+    currentPlantIndex = (currentPlantIndex - 1 + plantsStats.length) % plantsStats.length;
+    displayCurrentPlantStats();
+  }
+});
+
+document.getElementById('nextPlantButton').addEventListener('click', () => {
+  if (plantsStats.length > 0) {
+    currentPlantIndex = (currentPlantIndex + 1) % plantsStats.length;
+    displayCurrentPlantStats();
+  }
+});
+
+// Update stats every second:
+setInterval(updatePlantStats, 1000);
+
+
+    // Rain controls
+    document.getElementById('noRainButton').addEventListener('click', () => {
+      fetch('/set_rain', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ raining: false })
+      }).then(response => {
+        if (response.ok) console.log("No rain option activated");
+      });
+    });
+    document.getElementById('lightRainButton').addEventListener('click', () => {
+      fetch('/set_rain', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ raining: true, rain_intensity: 0.5 })
+      }).then(response => {
+        if (response.ok) console.log("Light rain activated");
+      });
+    });
+    document.getElementById('moderateRainButton').addEventListener('click', () => {
+      fetch('/set_rain', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ raining: true, rain_intensity: 1.0 })
+      }).then(response => {
+        if (response.ok) console.log("Moderate rain activated");
+      });
+    });
+    document.getElementById('heavyRainButton').addEventListener('click', () => {
+      fetch('/set_rain', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ raining: true, rain_intensity: 1.5 })
+      }).then(response => {
+        if (response.ok) console.log("Heavy rain activated");
+      });
+    });
+
+    // Overlay grid controls
+    document.getElementById('moistureOverlayButton').addEventListener('click', () => {
+      fetch('/set_overlay', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode: 'moisture' })
+      }).then(response => {
+        if (response.ok) console.log("Moisture overlay activated");
+      });
+    });
+    document.getElementById('nutrientOverlayButton').addEventListener('click', () => {
+      fetch('/set_overlay', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode: 'nutrients' })
+      }).then(response => {
+        if (response.ok) console.log("Nutrient overlay activated");
+      });
+    });
+    document.getElementById('combinedOverlayButton').addEventListener('click', () => {
+      fetch('/set_overlay', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode: 'combined' })
+      }).then(response => {
+        if (response.ok) console.log("Combined overlay activated");
+      });
+    });
+    document.getElementById('toggleOverlayGridButton').addEventListener('click', () => {
+      fetch('/set_overlay', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode: null })
+      }).then(response => {
+        if (response.ok) console.log("Overlay removed");
+      });
+    });
+
+    // Time scale presets
+    document.getElementById('normalSpeedButton').addEventListener('click', () => {
+      fetch('/set_time_scale', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ preset: "normal" })
+      }).then(response => {
+        if (response.ok) console.log("Time scale set to normal");
+      });
+    });
+    document.getElementById('fastSpeedButton').addEventListener('click', () => {
+      fetch('/set_time_scale', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ preset: "fast" })
+      }).then(response => {
+        if (response.ok) console.log("Time scale set to fast");
+      });
+    });
+    document.getElementById('ultraFastSpeedButton').addEventListener('click', () => {
+      fetch('/set_time_scale', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ preset: "ultra_fast" })
+      }).then(response => {
+        if (response.ok) console.log("Time scale set to ultra fast");
+      });
+    });
+
+    // Temperature and pH controls
+    document.getElementById('setTempButton').addEventListener('click', () => {
+      const newTemp = parseFloat(document.getElementById('tempInput').value);
+      fetch('/set_temperature', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ temperature: newTemp })
+      }).then(response => {
+        if (response.ok) console.log("Temperature updated to", newTemp);
+      });
+    });
+    document.getElementById('setPhButton').addEventListener('click', () => {
+      const newPh = parseFloat(document.getElementById('phInput').value);
+      fetch('/set_ph', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ph: newPh })
+      }).then(response => {
+        if (response.ok) console.log("Soil pH updated to", newPh);
+      });
+    });
+
+    // Update Environment Info
+    function updateEnvironmentInfo() {
+      fetch('/get_environment_info')
+        .then(response => response.json())
+        .then(data => {
+          document.getElementById('envTemperature').innerText = `Temperature: ${data.temperature} °C`;
+          document.getElementById('envDaylight').innerText = `Daylight: ${data.hours_of_daylight} hours`;
+          document.getElementById('envPrecipitation').innerText = `Precipitation: ${data.precipitation}`;
+          document.getElementById('envMoisture').innerText = `Average Moisture: ${data.average_moisture.toFixed(2)}`;
+          document.getElementById('envPH').innerText = `Soil pH: ${data.soil_ph}`;
+        })
+        .catch(error => console.error('Error fetching environment info:', error));
+    }
+    setInterval(updateEnvironmentInfo, 1000);
+
+
+    document.getElementById('displayInfoButton').addEventListener('click', () => {
+    fetch('/toggle_soil_info', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+    })
+    .then(response => response.json())
+    .then(data => console.log("Soil info mode:", data.display_info));
+  });
+
+    // Get the game screen element (your video feed image)
+    const gameScreen = document.getElementById("gameScreen");
+
+// Listen for mousemove events on the game screen
+gameScreen.addEventListener("mousemove", (event) => {
+  const rect = gameScreen.getBoundingClientRect();
+  const mouseX = event.clientX - rect.left;
+  const mouseY = event.clientY - rect.top;
+
+  // Send the coordinates to the server
+  fetch("/update_mouse", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ x: mouseX, y: mouseY })
+  })
+  .catch(err => console.error("Error sending mouse coordinates:", err));
+});
+
+  </script>
+</body>
+</html>

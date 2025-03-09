@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Plant Growth Simulation</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Roboto:400,500&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      background-color: #121212;
+      color: #eee;
+      font-family: 'Roboto', sans-serif;
+    }
+    .navbar-custom {
+      background-color: #333;
+    }
+    .navbar-custom .navbar-brand,
+    .navbar-custom .navbar-text {
+      color: #eee;
+    }
+    .main-container {
+      display: flex;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+    .info-container, .control-container {
+      flex: 1;
+      padding: 10px;
+      min-width: 200px;
+    }
+    .video-container {
+      flex: 2;
+      padding: 10px;
+      min-width: 300px;
+    }
+    .card {
+      background-color: #333;
+      color: #eee;
+      margin-bottom: 20px;
+    }
+    .card-header {
+      background-color: #444;
+      font-weight: 500;
+    }
+    .control-button {
+      margin-bottom: 8px;
+    }
+    .footer {
+      text-align: center;
+      margin: 20px 0;
+    }
+    /* Collapsible Environment Controls */
+    .toggle-env-btn {
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-custom">
+    <a class="navbar-brand" href="#">Plant Simulation</a>
+  </nav>
+
+  <div class="container-fluid">
+    <div class="row main-container">
+      <!-- Left Column: Plant & Environment Information -->
+      <div class="col-md-3 info-container">
+        <div class="card">
+          <div class="card-header">Plant Information</div>
+          <div class="card-body">
+            <p id="plantHeight">Height: 0 cm</p>
+            <p id="plantAge">Age: 0</p>
+            <p id="plantWeight">Weight: 0 g</p>
+            <p id="plantHealth">Health: N/A</p>
+            <p id="plantGermTime">Time to Germinate: 0 days</p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">Environment Information</div>
+          <div class="card-body">
+            <p id="envTemperature">Temperature: -- °C</p>
+            <p id="envDaylight">Daylight: -- hours</p>
+            <p id="envPrecipitation">Precipitation: --</p>
+            <p id="envMoisture">Average Moisture: --</p>
+            <p id="envPH">Soil pH: --</p>
+          </div>
+        </div>
+      </div>
+      <!-- Center Column: Video Feed & Collapsible Environment Controls -->
+      <div class="col-md-6 video-container">
+        <div class="card">
+          <div class="card-body text-center">
+            <img id="gameScreen" src="{{ url_for('video_feed') }}" class="img-fluid" style="max-width: 100%; height: auto;" />
+          </div>
+        </div>
+        <!-- Toggle Button for Environment Controls -->
+        <button class="btn btn-info btn-block toggle-env-btn" type="button" data-toggle="collapse" data-target="#envControls" aria-expanded="false" aria-controls="envControls">
+          Toggle Environment Controls
+        </button>
+        <!-- Collapsible Environment Controls Card -->
+        <div class="collapse" id="envControls">
+          <div class="card card-body">
+            <div class="card-header">Environment Controls</div>
+            <div class="card-body">
+              <!-- Temperature, pH, and Time of Day -->
+              <div class="form-group">
+                <label for="tempInput">Temperature (°C):</label>
+                <input type="number" id="tempInput" class="form-control" value="15" step="0.5" />
+                <button id="setTempButton" class="btn btn-secondary btn-block control-button mt-2">Set Temperature</button>
+              </div>
+              <div class="form-group">
+                <label for="phInput">Soil pH:</label>
+                <input type="number" id="phInput" class="form-control" value="7" step="0.1" />
+                <button id="setPhButton" class="btn btn-secondary btn-block control-button mt-2">Set Soil pH</button>
+              </div>
+              <div class="form-group">
+                <label for="timeSlider">Time of Day</label>
+                <input type="range" id="timeSlider" class="custom-range" min="0" max="100" value="0" />
+              </div>
+              <!-- Soil Type, Rain Options, and Water Placement -->
+              <div class="form-group mt-3">
+                <label>Soil Type</label>
+                <button class="btn btn-secondary btn-block control-button" id="sandyButton">Sandy</button>
+                <button class="btn btn-secondary btn-block control-button" id="clayButton">Clay</button>
+                <button class="btn btn-secondary btn-block control-button" id="siltButton">Silt</button>
+                <button class="btn btn-secondary btn-block control-button" id="peatButton">Peat</button>
+                <button class="btn btn-secondary btn-block control-button" id="chalkButton">Chalk</button>
+                <button class="btn btn-secondary btn-block control-button" id="loamButton">Loam</button>
+                <button class="btn btn-secondary btn-block control-button" id="brownEarthButton">Brown Earth</button>
+              </div>
+              <div class="form-group mt-3">
+                <label>Rain Options</label>
+                <button class="btn btn-secondary btn-block control-button" id="noRainButton">No Rain</button>
+                <button class="btn btn-secondary btn-block control-button" id="lightRainButton">Light Rain</button>
+                <button class="btn btn-secondary btn-block control-button" id="moderateRainButton">Moderate Rain</button>
+                <button class="btn btn-secondary btn-block control-button" id="heavyRainButton">Heavy Rain</button>
+              </div>
+              <div class="form-group mt-3">
+                <label>Water Placement</label>
+                <button class="btn btn-secondary btn-block control-button" id="placeWaterButton">Place Water</button>
+                <input type="number" id="waterPoolSize" class="form-control control-button" placeholder="Water Pool Size" min="1" max="10" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Right Column: Plant Type & Time Scale Presets -->
+      <div class="col-md-3 control-container">
+        <div class="card">
+          <div class="card-header">Plant Type</div>
+          <div class="card-body">
+            <button id="plantType1Button" class="btn btn-secondary control-button btn-block">Plant Type 1</button>
+            <button id="plantType2Button" class="btn btn-secondary control-button btn-block">Prickly Pear Cactus</button>
+            <button class="btn btn-secondary control-button btn-block">Plant Type 3</button>
+            <button class="btn btn-secondary control-button btn-block">Plant Type 4</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">Time Scale Presets</div>
+          <div class="card-body">
+            <button id="normalSpeedButton" class="btn btn-primary control-button btn-block">Normal</button>
+            <button id="fastSpeedButton" class="btn btn-primary control-button btn-block">Fast</button>
+            <button id="ultraFastSpeedButton" class="btn btn-primary control-button btn-block">Ultra Fast</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer Controls -->
+  <div class="footer">
+    <button class="btn btn-success" id="startButton">Start Simulation</button>
+    <button class="btn btn-warning" id="pauseButton">Pause Simulation</button>
+    <button class="btn btn-danger" id="resetButton">Reset Simulation</button>
+  </div>
+
+  <!-- Bootstrap JS and dependencies -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script>
+    // Wrap all event attachment code in DOMContentLoaded
+    document.addEventListener('DOMContentLoaded', function() {
+      // --- Season Controls ---
+      function setSeason(season) {
+        fetch('/set_season', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ season: season })
+        }).then(response => {
+          if (response.ok) console.log(`Season set to ${season}`);
+        });
+      }
+      document.getElementById('springButton').addEventListener('click', () => setSeason('spring'));
+      document.getElementById('summerButton').addEventListener('click', () => setSeason('summer'));
+      document.getElementById('autumnButton').addEventListener('click', () => setSeason('autumn'));
+      document.getElementById('winterButton').addEventListener('click', () => setSeason('winter'));
+
+      // --- Soil Type Controls (inside Environment Card) ---
+      function setSoilType(soilType) {
+        fetch('/set_soil_type', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ soil_type: soilType })
+        }).then(response => {
+          if (response.ok) console.log(`Soil type set to ${soilType}`);
+        });
+      }
+      document.getElementById('sandyButton').addEventListener('click', () => setSoilType('sandy'));
+      document.getElementById('clayButton').addEventListener('click', () => setSoilType('clay'));
+      document.getElementById('siltButton').addEventListener('click', () => setSoilType('silt'));
+      document.getElementById('peatButton').addEventListener('click', () => setSoilType('peat'));
+      document.getElementById('chalkButton').addEventListener('click', () => setSoilType('chalk'));
+      document.getElementById('loamButton').addEventListener('click', () => setSoilType('loam'));
+      document.getElementById('brownEarthButton').addEventListener('click', () => setSoilType('brown_earth'));
+
+      // --- Rain Controls (inside Environment Card) ---
+      function setRain(option, intensity = 0) {
+        fetch('/set_rain', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ raining: option !== 'no', rain_intensity: intensity })
+        }).then(response => {
+          if (response.ok) console.log(`${option} rain activated`);
+        });
+      }
+      document.getElementById('noRainButton').addEventListener('click', () => setRain('no'));
+      document.getElementById('lightRainButton').addEventListener('click', () => setRain('light', 0.5));
+      document.getElementById('moderateRainButton').addEventListener('click', () => setRain('moderate', 1.0));
+      document.getElementById('heavyRainButton').addEventListener('click', () => setRain('heavy', 1.5));
+
+      // --- Water Placement (inside Environment Card) ---
+      let placeWaterMode = false;
+      document.getElementById('placeWaterButton').addEventListener('click', () => {
+        placeWaterMode = true;
+        console.log("Place Water mode activated");
+      });
+
+      // --- Single Game Screen Click Handler for Water & Seed Placement ---
+      let placeSeedMode = false;
+      document.getElementById('gameScreen').addEventListener('click', function(event) {
+        const rect = event.target.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+        // Check if water placement mode is active
+        if (placeWaterMode) {
+          const size = document.getElementById('waterPoolSize').value || 4;
+          fetch('/mouse_event', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ x: x, y: y, type: 'water', size: size })
+          });
+          placeWaterMode = false;
+        }
+        // Else if seed placement mode is active
+        else if (placeSeedMode) {
+          fetch('/mouse_event', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ x: x, y: y, type: 'seed', seed_type: window.seedType || 'normal' })
+          });
+          placeSeedMode = false;
+          window.seedType = null;
+        }
+      });
+
+      // --- Plant Type Controls (Right Column) ---
+      document.getElementById('plantType1Button').addEventListener('click', () => {
+        placeSeedMode = true;
+      });
+      document.getElementById('plantType2Button').addEventListener('click', () => {
+        placeSeedMode = true;
+        window.seedType = 'cactus';
+        console.log('Cactus seed selected');
+      });
+
+      // --- Time of Day Control ---
+      document.getElementById('timeSlider').addEventListener('input', function() {
+        const timeValue = parseInt(this.value, 10);
+        fetch('/set_time_of_day', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ time: timeValue })
+        }).then(response => {
+          if (response.ok) console.log('Time of day set to', timeValue);
+        });
+      });
+
+      // --- Temperature & pH Controls (inside Environment Card) ---
+      document.getElementById('setTempButton').addEventListener('click', function() {
+        const newTemp = parseFloat(document.getElementById('tempInput').value);
+        fetch('/set_temperature', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ temperature: newTemp })
+        }).then(response => {
+          if (response.ok) console.log("Temperature updated to", newTemp);
+        });
+      });
+      document.getElementById('setPhButton').addEventListener('click', function() {
+        const newPh = parseFloat(document.getElementById('phInput').value);
+        fetch('/set_ph', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ph: newPh })
+        }).then(response => {
+          if (response.ok) console.log("Soil pH updated to", newPh);
+        });
+      });
+
+      // --- Time Scale Presets (Right Column) ---
+      document.getElementById('normalSpeedButton').addEventListener('click', () => {
+        fetch('/set_time_scale', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ preset: "normal" })
+        }).then(response => {
+          if (response.ok) console.log("Time scale set to normal");
+        });
+      });
+      document.getElementById('fastSpeedButton').addEventListener('click', () => {
+        fetch('/set_time_scale', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ preset: "fast" })
+        }).then(response => {
+          if (response.ok) console.log("Time scale set to fast");
+        });
+      });
+      document.getElementById('ultraFastSpeedButton').addEventListener('click', () => {
+        fetch('/set_time_scale', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ preset: "ultra_fast" })
+        }).then(response => {
+          if (response.ok) console.log("Time scale set to ultra fast");
+        });
+      });
+
+      // --- Environment Info Updater ---
+      function updateEnvironmentInfo() {
+        fetch('/get_environment_info')
+          .then(response => response.json())
+          .then(data => {
+            document.getElementById('envTemperature').innerText = `Temperature: ${data.temperature} °C`;
+            document.getElementById('envDaylight').innerText = `Daylight: ${data.hours_of_daylight} hours`;
+            document.getElementById('envPrecipitation').innerText = `Precipitation: ${data.precipitation}`;
+            document.getElementById('envMoisture').innerText = `Average Moisture: ${data.average_moisture.toFixed(2)}`;
+            document.getElementById('envPH').innerText = `Soil pH: ${data.soil_ph}`;
+          })
+          .catch(error => console.error('Error fetching environment info:', error));
+      }
+      setInterval(updateEnvironmentInfo, 1000);
+    });
+  </script>
+</body>
+</html>
