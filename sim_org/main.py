@@ -268,7 +268,7 @@ def game_loop():
 
 
 
-            pygame.display.set_mode()
+          
             pygame.display.flip()
             clock.tick(5)
 
