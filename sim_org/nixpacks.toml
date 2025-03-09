@@ -8,5 +8,4 @@ aptPkgs = [
 ]
 
 [start]
-cmd = gunicorn app:app
-
+cmd = "gunicorn app:app"
