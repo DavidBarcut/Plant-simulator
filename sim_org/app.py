@@ -289,7 +289,7 @@ def run_flask():
     # Use socketio.run so that Socket.IO is integrated
     socketio.run(app, host="0.0.0.0", port=port, debug=False, use_reloader=False)
 
-if __name__ == '__main__':
+def start_all_threads():
     flask_thread = threading.Thread(target=run_flask, daemon=True)
     flask_thread.start()
 
@@ -297,4 +297,3 @@ if __name__ == '__main__':
     emitter_thread.start()
 
     sim.game_loop()
-
