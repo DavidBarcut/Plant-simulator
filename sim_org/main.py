@@ -178,6 +178,7 @@ def game_loop():
     global display_info_mode, soil_info_text, soil_info_pos
     running = True
     while running:
+        print("Game loop running")
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
