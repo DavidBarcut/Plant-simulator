@@ -1,7 +1,7 @@
 [phases.setup]
 nixPkgs = [
   "python311",    # Ensure the correct Python version
-  "xvfb",         # Virtual framebuffer for Pygame
+  "xorg.xorgserver",  # Correct package for Xvfb
   "SDL2",         # Main SDL2 library
   "SDL2_image",   # SDL2 image support
   "SDL2_mixer",   # SDL2 audio mixer
