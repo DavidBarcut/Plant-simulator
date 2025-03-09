@@ -179,7 +179,7 @@ def game_loop():
     running = True
     
     while running:
-        print("Game loop running")
+       
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
