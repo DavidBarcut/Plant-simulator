@@ -4,7 +4,7 @@ import pygame
 import math
 import random
 import threading
-import socketio
+import eventlet
 from soil import set_soil_type, soil_properties, initialize_soil_grid, SEASONS, draw_soil_horizons, SOIL_TYPES
 from Plants.plant import Seed
 from water import WaterBlock
@@ -271,6 +271,6 @@ def game_loop():
 
             pygame.display.flip()
             clock.tick(5)
-            socketio.sleep(0)
+            eventlet.sleep(0)
 
 
