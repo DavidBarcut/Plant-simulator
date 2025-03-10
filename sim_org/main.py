@@ -4,7 +4,7 @@ import pygame
 import math
 import random
 import threading
-
+import socketio
 from soil import set_soil_type, soil_properties, initialize_soil_grid, SEASONS, draw_soil_horizons, SOIL_TYPES
 from Plants.plant import Seed
 from water import WaterBlock
@@ -13,7 +13,7 @@ from config import SCREEN_SIZE, WHITE, CELL_SIZE, ROWS, COLS
 import os
 os.environ["SDL_VIDEODRIVER"] = "dummy"
 
-sscreen = pygame.display.set_mode(SCREEN_SIZE)
+screen = pygame.display.set_mode(SCREEN_SIZE)
 
 clock = pygame.time.Clock()
 screen_lock = threading.Lock()
@@ -271,5 +271,6 @@ def game_loop():
 
             pygame.display.flip()
             clock.tick(5)
+            socketio.sleep(0)
 
 
