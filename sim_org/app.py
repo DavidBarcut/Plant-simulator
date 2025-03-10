@@ -1,3 +1,6 @@
+import eventlet
+eventlet.monkey_patch()
+
 from flask import Flask, render_template, request, jsonify
 from flask_socketio import SocketIO, emit
 import threading
@@ -300,15 +303,28 @@ def get_environment_info():
     return jsonify(info)
 
 
-def run_flask():
-    port = int(os.environ.get("PORT", 5000))
-    socketio.run(app, host="0.0.0.0", port=port, debug=False, use_reloader=False)
-
+def run_flask_in_background():
+    # Run Flask-SocketIO in a background thread
+    flask_thread = threading.Thread(target=lambda: socketio.run(app, host="0.0.0.0", port=int(os.environ.get("PORT", 5000)), debug=False, use_reloader=False), daemon=True)
+    flask_thread.start()
 # Start background tasks using Socket.IO's built-in support.
-socketio.start_background_task(frame_emitter)
-socketio.start_background_task(sim.game_loop)
+# socketio.start_background_task(frame_emitter)
+# socketio.start_background_task(sim.game_loop)
 
+
+# if __name__ == '__main__':
+#     run_flask()
+#     sim.game_loop()
 
 if __name__ == '__main__':
-    run_flask()
+    # Initialize Pygame display in the main thread
+    pygame.init()
+    sim.screen = pygame.display.set_mode(config.SCREEN_SIZE)
+    sim.clock = pygame.time.Clock()
+
+    # Start Flask server in a background thread
+    run_flask_in_background()
+    # Start the frame emitter as a background task
+    socketio.start_background_task(frame_emitter)
+    # Now run the game loop in the main thread
     sim.game_loop()

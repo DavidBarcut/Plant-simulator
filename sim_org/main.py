@@ -13,7 +13,8 @@ from config import SCREEN_SIZE, WHITE, CELL_SIZE, ROWS, COLS
 import os
 os.environ["SDL_VIDEODRIVER"] = "dummy"
 
-screen = pygame.Surface(SCREEN_SIZE)
+sscreen = pygame.display.set_mode(SCREEN_SIZE)
+
 clock = pygame.time.Clock()
 screen_lock = threading.Lock()
 
