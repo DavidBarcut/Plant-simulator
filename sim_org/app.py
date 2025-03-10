@@ -12,7 +12,7 @@ import os
 os.environ["SDL_VIDEODRIVER"] = "dummy"  # Force headless mode
 
 import main as sim
-from main import screen  # Our Pygame screen
+
 
 from soil import SOIL_TYPES, SEASONS
 
