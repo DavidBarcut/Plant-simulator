@@ -308,8 +308,8 @@ def run_flask():
         socketio.run(app, host="0.0.0.0", port=port, debug=False, use_reloader=False)
         
 # Start background tasks using Socket.IO's built-in support.
-# socketio.start_background_task(frame_emitter)
-# socketio.start_background_task(sim.game_loop)
+socketio.start_background_task(frame_emitter)
+socketio.start_background_task(sim.game_loop)
 
 
 # if __name__ == '__main__':
@@ -329,6 +329,6 @@ if __name__ == '__main__':
 
     # Start the frame emitter as a background task
     socketio.start_background_task(frame_emitter)
-
-    # Now run your game loop (from main.py) in the main thread.
-    sim.game_loop()
+socketio.start_background_task(sim.game_loop)
+    # # Now run your game loop (from main.py) in the main thread.
+    # sim.game_loop()
