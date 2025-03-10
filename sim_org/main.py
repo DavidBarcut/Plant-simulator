@@ -179,73 +179,57 @@ def game_loop():
     global display_info_mode, soil_info_text, soil_info_pos
     running = True
     
-    # while running:
+    while running:
        
-    #     for event in pygame.event.get():
-    #         if event.type == pygame.QUIT:
-    #             running = False
-    #         elif event.type == pygame.KEYDOWN:
-    #             if event.key == pygame.K_i:
-    #                 display_info_mode = not display_info_mode
-    #         elif event.type == pygame.MOUSEMOTION:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_i:
+                    display_info_mode = not display_info_mode
+            elif event.type == pygame.MOUSEMOTION:
             
-    #             soil_info_pos = event.pos
-    #         elif event.type == pygame.MOUSEBUTTONDOWN:
-    #             if event.button == 1: 
-    #                 mouse_x, mouse_y = event.pos
-    #                 seeds.append(Seed(mouse_x, mouse_y))
+                soil_info_pos = event.pos
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1: 
+                    mouse_x, mouse_y = event.pos
+                    seeds.append(Seed(mouse_x, mouse_y))
         
 
-    #     if display_info_mode:
-    #         # Use the global soil_info_pos updated by the client
-    #         print("Updated soil_info_pos from client:", soil_info_pos)  
-    #         info = get_soil_horizon_info(soil_info_pos[1])
-    #         soil_info_text = info if info else ""
-    #     else:
-            # soil_info_text = ""
-
-
-        # Example: Move a red rectangle back and forth
-    x = 50
-    direction = 5
-
-    while running:
-        x += direction
-        if x > SCREEN_SIZE[0] - 100 or x < 0:
-            direction = -direction
-
-        screen.fill(WHITE)
-        pygame.draw.rect(screen, (255, 0, 0), (x, 50, 100, 100))
-        pygame.display.flip()
-        clock.tick(5)
-        socketio.sleep(0)
+        if display_info_mode:
+            # Use the global soil_info_pos updated by the client
+            print("Updated soil_info_pos from client:", soil_info_pos)  
+            info = get_soil_horizon_info(soil_info_pos[1])
+            soil_info_text = info if info else ""
+        else:
+            soil_info_text = ""
 
 
 
-        # with screen_lock:
-        #     screen.fill(WHITE)
-        #     if simulation_running:
-        #         sun.update()
-        #         moon.update()
+        with screen_lock:
+            screen.fill(WHITE)
+            if simulation_running:
+                sun.update()
+                moon.update()
 
 
             
 
-        #     draw_sky(screen)
+            draw_sky(screen)
 
-        #     if raining:
-        #         simulate_rain(soil_properties, rain_intensity)
-        #         update_and_draw_rain(screen, rain_intensity)
+            if raining:
+                simulate_rain(soil_properties, rain_intensity)
+                update_and_draw_rain(screen, rain_intensity)
 
-        #     draw_soil_horizons(screen)
-        #     if overlay_mode is not None:
-        #         draw_overlay_grid(screen, overlay_mode)
+            draw_soil_horizons(screen)
+            if overlay_mode is not None:
+                draw_overlay_grid(screen, overlay_mode)
 
 
-        #     for seed in seeds:
-        #         seed.draw(screen, simulation_running)
-        #     for water_block in water_blocks:
-        #         water_block.draw(screen)
+            for seed in seeds:
+                seed.draw(screen, simulation_running)
+            for water_block in water_blocks:
+                water_block.draw(screen)
 
          
          

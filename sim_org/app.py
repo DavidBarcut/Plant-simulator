@@ -1,7 +1,7 @@
 import eventlet
 eventlet.monkey_patch()
 
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, Response
 from flask_socketio import SocketIO, emit
 import threading
 import pygame
@@ -73,14 +73,14 @@ def on_connect():
 
 
 
-# @app.route('/video_feed')
-# def video_feed():
-#     def generate():
-#         while True:
-#             frame = capture_frame()
-#             yield (b'--frame\r\n'
-#                    b'Content-Type: image/jpeg\r\n\r\n' + frame.read() + b'\r\n')
-#     return Response(generate(), mimetype='multipart/x-mixed-replace; boundary=frame')
+@app.route('/video_feed')
+def video_feed():
+    def generate():
+        while True:
+            frame = capture_frame()
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame.read() + b'\r\n')
+    return Response(generate(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 @app.route('/set_overlay', methods=['POST'])
 def set_overlay():
@@ -102,16 +102,7 @@ def mouse_event():
     if data.get('type') == 'water':
         sim.water_blocks.append(sim.WaterBlock(mouse_x, mouse_y, size))
     else:
-        if seed_type == 'cactus':
-            from Plants.cactus import Cactus
-            cactus = Cactus(mouse_x, mouse_y)
-           
-            cactus.hydration = cactus.saturation_ratio  
-            cactus.grow()
-            sim.seeds.append(cactus)
-            print("Cactus seed created and germinated")
-        else:
-            sim.seeds.append(sim.Seed(mouse_x, mouse_y))
+        sim.seeds.append(sim.Seed(mouse_x, mouse_y))
     return '', 204
 
 @app.route('/set_soil_type', methods=['POST'])
