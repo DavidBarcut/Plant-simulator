@@ -11,6 +11,7 @@ nixPkgs = [
 ]
 
 [start]
-cmd = "xvfb-run -s "-screen 0 1024x768x24" python app.py"
+cmd = "xvfb-run -s \"-screen 0 1024x768x24\" python app.py"
+
 
 
