@@ -14,8 +14,6 @@ import os
 os.environ["SDL_VIDEODRIVER"] = "dummy"
 
 screen = pygame.Surface(SCREEN_SIZE)
-pygame.display.set_mode(SCREEN_SIZE)
-
 clock = pygame.time.Clock()
 screen_lock = threading.Lock()
 
